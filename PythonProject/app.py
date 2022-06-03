@@ -27,7 +27,7 @@ n_population = 100
 
 mutation_rate = 0.3
 
-API_KEY = "AIzaSyBZdQaVREDa7RUYYVMuyySSrSs2sDlrL0o"
+API_KEY = "API"
 
 client = googlemaps.Client(API_KEY)
 
