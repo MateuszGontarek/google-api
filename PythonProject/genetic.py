@@ -2,47 +2,41 @@ import numpy as np
 import random
 from datetime import datetime
 import googlemaps
-
-n_cities = 20
+import app
+import app
 
 n_population = 100
-
 mutation_rate = 0.3
 
-API_KEY = "AIzaSyBZdQaVREDa7RUYYVMuyySSrSs2sDlrL0o"
+API_KEY = "API_KEY"
 
 client = googlemaps.Client(API_KEY)
-
-coordinates_list = [[x,y] for x,y in zip(np.random.randint(0,100,n_cities),np.random.randint(0,100,n_cities))]
-names_list = np.array(['Berlin', 'London', 'Moscow', 'Barcelona', 'Rome', 'Paris', 'Vienna', 'Munich', 'Istanbul', 'Kyiv', 'Bucharest', 'Minsk', 'Warsaw', 'Budapest', 'Milan', 'Prague', 'Sofia', 'Birmingham', 'Brussels', 'Amsterdam'])
-cities_dict = { x:y for x,y in zip(names_list,coordinates_list)}
 
 def compute_city_distance_coordinates(a,b):
     lok1 = str(a[0])+','+str(a[1])
     lok2 = str(b[0])+','+str(b[1])
-    print(lok1, lok2)
     directions_result = client.directions(origin=lok1,
                                       destination=lok2,
                                       mode="driving",
                                       avoid="ferries")
 
     
-    print(directions_result)
-
+    return directions_result[0]['legs'][0]['distance']['value']
 
 def compute_city_distance_names(city_a, city_b, cities_dict):
     return compute_city_distance_coordinates(cities_dict[city_a], cities_dict[city_b])
 
-def genesis(city_list, n_population):
+def genesis(city_list, n_population, n_cities):
 
     population_set = []
     for i in range(n_population):
+        city_list = np.array(city_list)
         #Randomly generating a new solution
         sol_i = city_list[np.random.choice(list(range(n_cities)), n_cities, replace=False)]
         population_set.append(sol_i)
     return np.array(population_set)
 
-def fitness_eval(city_list, cities_dict):
+def fitness_eval(city_list, cities_dict, n_cities):
     total = 0
     for i in range(n_cities-1):
         a = city_list[i]
@@ -50,19 +44,19 @@ def fitness_eval(city_list, cities_dict):
         total += compute_city_distance_names(a,b, cities_dict)
     return total
 
-def get_all_fitnes(population_set, cities_dict):
+def get_all_fitnes(population_set, cities_dict, n_cities):
     fitnes_list = np.zeros(n_population)
 
     #Looping over all solutions computing the fitness for each solution
     for i in  range(n_population):
-        fitnes_list[i] = fitness_eval(population_set[i], cities_dict)
+        fitnes_list[i] = fitness_eval(population_set[i], cities_dict, n_cities)
 
     return fitnes_list
 
 def progenitor_selection(population_set,fitnes_list):
     total_fit = fitnes_list.sum()
     prob_list = fitnes_list/total_fit
-    
+
     #Notice there is the chance that a progenitor. mates with oneself
     progenitor_list_a = np.random.choice(list(range(len(population_set))), len(population_set),p=prob_list, replace=True)
     progenitor_list_b = np.random.choice(list(range(len(population_set))), len(population_set),p=prob_list, replace=True)
@@ -92,7 +86,7 @@ def mate_population(progenitor_list):
         
     return new_population_set
 
-def mutate_offspring(offspring):
+def mutate_offspring(offspring , n_cities):
     for q in range(int(n_cities*mutation_rate)):
         a = np.random.randint(0,n_cities)
         b = np.random.randint(0,n_cities)
@@ -101,28 +95,30 @@ def mutate_offspring(offspring):
 
     return offspring
       
-def mutate_population(new_population_set):
+def mutate_population(new_population_set, n_cities):
     mutated_pop = []
     for offspring in new_population_set:
-        mutated_pop.append(mutate_offspring(offspring))
+        mutated_pop.append(mutate_offspring(offspring, n_cities))
     return mutated_pop
+def finish(n_cities, names_list, cities_dict):
+    print(names_list)
+    print(cities_dict)
 
-def finish():
-    population_set = genesis(names_list, n_population)
+    population_set = genesis(names_list, n_population, n_cities)
 
-    fitnes_list = get_all_fitnes(population_set,cities_dict)
+    fitnes_list = get_all_fitnes(population_set,cities_dict, n_cities)
 
     progenitor_list = progenitor_selection(population_set,fitnes_list)
 
     new_population_set = mate_population(progenitor_list)
 
-    mutated_pop = mutate_population(new_population_set)
+    mutated_pop = mutate_population(new_population_set, n_cities)
 
     best_solution = [-1,np.inf,np.array([])]
 
-    for i in range(1000):
-        if i%100==0: print(i, fitnes_list.min(), fitnes_list.mean(), datetime.now().strftime("%d/%m/%y %H:%M"))
-        fitnes_list = get_all_fitnes(mutated_pop,cities_dict)
+    for i in range(200):
+        print(i, fitnes_list.min(), fitnes_list.mean(), datetime.now().strftime("%d/%m/%y %H:%M"))
+        fitnes_list = get_all_fitnes(mutated_pop,cities_dict, n_cities)
         
         #Saving the best solution
         if fitnes_list.min() < best_solution[1]:
@@ -133,5 +129,5 @@ def finish():
         progenitor_list = progenitor_selection(population_set,fitnes_list)
         new_population_set = mate_population(progenitor_list)
         
-        mutated_pop = mutate_population(new_population_set)
+        mutated_pop = mutate_population(new_population_set, n_cities)
     print(best_solution)
