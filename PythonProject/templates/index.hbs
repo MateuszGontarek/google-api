@@ -5,9 +5,10 @@
 {% endblock %}
 
 {% block body %}
-<div class="content">
+<div class="containter">
     <h1>Wprowadź współrzędne</h1>
-    <table>
+    <div class="content">
+         <table>
         <tr>
             <th>Nazwa</th>
             <th>Długość geograficzna</th>
@@ -26,10 +27,10 @@
         <tr>
             <div class="form">
                 <form action="/" method="POST">
-                    <td><input type="text" name="name" id="name" placeholder="Podaj Nazwe Lokalizacji" ></td>
-                    <td><input type="number" step="0.000001" name="dlugosc" id="dlugosc"  placeholder="Wprowadź długość"></td>
-                    <td><input type="number" step="0.000001" name="szerokosc" id="szerokosc"  placeholder="Wprowadź szerokość"></td>
-                    <td><input type="submit" name="submit" value="Wyślij"></td>
+                    <td class="update"><input type="text" name="name" id="name" placeholder="Podaj Nazwe Lokalizacji" ></td>
+                    <td class="update"><input type="number" step="0.000001" name="dlugosc" id="dlugosc"  placeholder="Wprowadź długość"></td>
+                    <td class="update"><input type="number" step="0.000001" name="szerokosc" id="szerokosc"  placeholder="Wprowadź szerokość"></td>
+                    <td class="update"><input type="submit" name="submit" value="Wyślij"></td>
                 </form>
             </div>
         </tr>
@@ -37,6 +38,7 @@
     <div class="submit">
         <a href="result" id="submit" class="submit" method="POST">Zatwierdź</a>
         <a href="delete" id="delete" class="delete" method="POST">Usuń Wszystko</a>
+    </div>
     </div>
 </div>
 {% endblock %}

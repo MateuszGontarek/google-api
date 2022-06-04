@@ -58,7 +58,7 @@ def update (id):
 
 @app.route('/result', methods=['GET', 'POST'])
 def result():
-    
+
     n_cities = Wspolrzedne.query.count()
     names_list  = []
     cordinates_list = []
@@ -74,7 +74,9 @@ def result():
     names_list = oneDArray(names_list)
 
     cities_dict = { x:y for x,y in zip(names_list, cordinates_list) }
+
     returnValue = genetic.finish(n_cities, names_list, cities_dict)
+     
     tasks = []
 
     for i in range(len(returnValue)):
@@ -83,7 +85,11 @@ def result():
             tasks.append(list(row))
 
     print(tasks)
-
-    return render_template('result.hbs', task=tasks)
+    url = "https://www.google.pl/maps/dir/"
+    for i in range(len(returnValue)):
+        url += str(cities_dict[returnValue[i]][0]) + "," + str(cities_dict[returnValue[i]][1]) + "/"
+    url +=  str(cities_dict[returnValue[0]][0]) + "," + str(cities_dict[returnValue[0]][1])
+    print(url)
+    return render_template('result.hbs', task=tasks, url=url)
 if __name__ == "__main__":
     app.run(debug=True)
