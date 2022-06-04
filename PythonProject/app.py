@@ -62,15 +62,18 @@ def result():
     n_cities = Wspolrzedne.query.count()
     names_list  = []
     cordinates_list = []
+    listId = []
+    for i in db.session.query(Wspolrzedne.id).all():
+        listId.append(list(i)[0])
 
-    for i in range(Wspolrzedne.query.count()):
-
-        row = list(db.session.query(Wspolrzedne.name).filter(Wspolrzedne.id == i + 1))
+    for i in listId:
+        
+        row = list(db.session.query(Wspolrzedne.name).filter(Wspolrzedne.id == i))
         names_list.append(list(row[0]))
 
-        row = list(db.session.query(Wspolrzedne.dlugosc, Wspolrzedne.szerokosc).filter(Wspolrzedne.id == i + 1))
+        row = list(db.session.query(Wspolrzedne.dlugosc, Wspolrzedne.szerokosc).filter(Wspolrzedne.id == i))
         cordinates_list.append(list(row[0]))
-    
+
     names_list = oneDArray(names_list)
 
     cities_dict = { x:y for x,y in zip(names_list, cordinates_list) }
