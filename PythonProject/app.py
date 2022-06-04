@@ -1,12 +1,6 @@
-from sys import dllhandle
-from tkinter import W
 from flask import Flask, redirect, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import column
-import googlemaps
-import numpy as np
-import datetime
-import random
 import itertools
 import genetic
 
@@ -39,6 +33,19 @@ def index():
         tasks = Wspolrzedne.query.all()
         return render_template("index.hbs", tasks=tasks)
 
+@app.route('/delete')
+def delete():
+    db.session.query(Wspolrzedne).delete()
+    db.session.commit()
+    return redirect('/')
+
+@app.route('/delete/<int:id>')
+def delete_task(id):
+    task = Wspolrzedne.query.get(id)
+    db.session.delete(task)
+    db.session.commit()
+    return redirect('/')
+
 @app.route('/update/<int:id>', methods=['GET', 'POST'])
 def update (id):
     task = Wspolrzedne.query.get_or_404(id)
@@ -51,22 +58,32 @@ def update (id):
 
 @app.route('/result', methods=['GET', 'POST'])
 def result():
+    
     n_cities = Wspolrzedne.query.count()
     names_list  = []
     cordinates_list = []
-    population_set = []
+
     for i in range(Wspolrzedne.query.count()):
+
         row = list(db.session.query(Wspolrzedne.name).filter(Wspolrzedne.id == i + 1))
         names_list.append(list(row[0]))
+
         row = list(db.session.query(Wspolrzedne.dlugosc, Wspolrzedne.szerokosc).filter(Wspolrzedne.id == i + 1))
         cordinates_list.append(list(row[0]))
     
     names_list = oneDArray(names_list)
 
     cities_dict = { x:y for x,y in zip(names_list, cordinates_list) }
-    print(names_list)
-    print(cities_dict)
-    genetic.finish(n_cities, names_list, cities_dict)
-    return render_template('result.hbs')
+    returnValue = genetic.finish(n_cities, names_list, cities_dict)
+    tasks = []
+
+    for i in range(len(returnValue)):
+        if returnValue[i] in cities_dict.keys():
+            row = returnValue[i], cities_dict[returnValue[i]][0], cities_dict[returnValue[i]][1]
+            tasks.append(list(row))
+
+    print(tasks)
+
+    return render_template('result.hbs', task=tasks)
 if __name__ == "__main__":
     app.run(debug=True)

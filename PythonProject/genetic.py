@@ -1,27 +1,34 @@
 import numpy as np
-import random
 from datetime import datetime
 import googlemaps
-import app
-import app
+import itertools
 
 n_population = 100
 mutation_rate = 0.3
-
-API_KEY = "API_KEY"
+DistanceList = []
+API_KEY = "API"
 
 client = googlemaps.Client(API_KEY)
 
+def oneDArray(x):
+    return list(itertools.chain(*x))
+
 def compute_city_distance_coordinates(a,b):
+    for i in range(len(DistanceList)):
+        if a == DistanceList[i][1] and b == DistanceList[i][2]:
+            return DistanceList[i][0]
     lok1 = str(a[0])+','+str(a[1])
     lok2 = str(b[0])+','+str(b[1])
     directions_result = client.directions(origin=lok1,
                                       destination=lok2,
                                       mode="driving",
                                       avoid="ferries")
+                                      
+    toAppend = directions_result[0]['legs'][0]['distance']['value'], a, b
+    toAppend = list(toAppend)
+    DistanceList.append(toAppend)
 
-    
-    return directions_result[0]['legs'][0]['distance']['value']
+    return directions_result[0]['legs'][0]['distance']['value'] 
 
 def compute_city_distance_names(city_a, city_b, cities_dict):
     return compute_city_distance_coordinates(cities_dict[city_a], cities_dict[city_b])
@@ -101,8 +108,6 @@ def mutate_population(new_population_set, n_cities):
         mutated_pop.append(mutate_offspring(offspring, n_cities))
     return mutated_pop
 def finish(n_cities, names_list, cities_dict):
-    print(names_list)
-    print(cities_dict)
 
     population_set = genesis(names_list, n_population, n_cities)
 
@@ -115,9 +120,8 @@ def finish(n_cities, names_list, cities_dict):
     mutated_pop = mutate_population(new_population_set, n_cities)
 
     best_solution = [-1,np.inf,np.array([])]
-
-    for i in range(200):
-        print(i, fitnes_list.min(), fitnes_list.mean(), datetime.now().strftime("%d/%m/%y %H:%M"))
+    for i in range(100):
+        if i%100==0: print(i, fitnes_list.min(), fitnes_list.mean(), datetime.now().strftime("%d/%m/%y %H:%M"))
         fitnes_list = get_all_fitnes(mutated_pop,cities_dict, n_cities)
         
         #Saving the best solution
@@ -130,4 +134,6 @@ def finish(n_cities, names_list, cities_dict):
         new_population_set = mate_population(progenitor_list)
         
         mutated_pop = mutate_population(new_population_set, n_cities)
-    print(best_solution)
+    best_solution[2]  = best_solution[2].tolist()
+
+    return best_solution[2][0]
