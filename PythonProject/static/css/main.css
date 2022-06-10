@@ -11,6 +11,10 @@ h1 {
     margin-bottom: 20px;
     color: #fff;
 }
+.error {
+    color: #ff0000;
+    font-size: 1.5em;
+}
 .content {
     width: 100%;
     max-width: 600px;

@@ -58,41 +58,43 @@ def update (id):
 
 @app.route('/result', methods=['GET', 'POST'])
 def result():
+    try:
+        n_cities = Wspolrzedne.query.count()
+        names_list  = []
+        cordinates_list = []
+        listId = []
+        for i in db.session.query(Wspolrzedne.id).all():
+            listId.append(list(i)[0])
 
-    n_cities = Wspolrzedne.query.count()
-    names_list  = []
-    cordinates_list = []
-    listId = []
-    for i in db.session.query(Wspolrzedne.id).all():
-        listId.append(list(i)[0])
+        for i in listId:
 
-    for i in listId:
+            row = list(db.session.query(Wspolrzedne.name).filter(Wspolrzedne.id == i))
+            names_list.append(list(row[0]))
 
-        row = list(db.session.query(Wspolrzedne.name).filter(Wspolrzedne.id == i))
-        names_list.append(list(row[0]))
+            row = list(db.session.query(Wspolrzedne.dlugosc, Wspolrzedne.szerokosc).filter(Wspolrzedne.id == i))
+            cordinates_list.append(list(row[0]))
 
-        row = list(db.session.query(Wspolrzedne.dlugosc, Wspolrzedne.szerokosc).filter(Wspolrzedne.id == i))
-        cordinates_list.append(list(row[0]))
+        names_list = oneDArray(names_list)
 
-    names_list = oneDArray(names_list)
+        cities_dict = { x:y for x,y in zip(names_list, cordinates_list) }
 
-    cities_dict = { x:y for x,y in zip(names_list, cordinates_list) }
-
-    returnValue = genetic.finish(n_cities, names_list, cities_dict)
-     
-    tasks = []
-
-    for i in range(len(returnValue)):
-        if returnValue[i] in cities_dict.keys():
-            row = returnValue[i], cities_dict[returnValue[i]][0], cities_dict[returnValue[i]][1]
-            tasks.append(list(row))
-            
-    url = "https://www.google.pl/maps/dir/"
-    for i in range(len(returnValue)):
-        url += str(cities_dict[returnValue[i]][0]) + "," + str(cities_dict[returnValue[i]][1]) + "/"
+        returnValue = genetic.finish(n_cities, names_list, cities_dict)
         
-    url +=  str(cities_dict[returnValue[0]][0]) + "," + str(cities_dict[returnValue[0]][1])
+        tasks = []
 
-    return render_template('result.hbs', task=tasks, url=url)
+        for i in range(len(returnValue)):
+            if returnValue[i] in cities_dict.keys():
+                row = returnValue[i], cities_dict[returnValue[i]][0], cities_dict[returnValue[i]][1]
+                tasks.append(list(row))
+                
+        url = "https://www.google.pl/maps/dir/"
+        for i in range(len(returnValue)):
+            url += str(cities_dict[returnValue[i]][0]) + "," + str(cities_dict[returnValue[i]][1]) + "/"
+
+        url +=  str(cities_dict[returnValue[0]][0]) + "," + str(cities_dict[returnValue[0]][1])
+
+        return render_template('result.hbs', task=tasks, url=url)
+    except:
+        return render_template('error.hbs')
 if __name__ == "__main__":
     app.run(debug=True)
