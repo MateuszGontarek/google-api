@@ -67,7 +67,7 @@ def result():
         listId.append(list(i)[0])
 
     for i in listId:
-        
+
         row = list(db.session.query(Wspolrzedne.name).filter(Wspolrzedne.id == i))
         names_list.append(list(row[0]))
 
@@ -86,13 +86,13 @@ def result():
         if returnValue[i] in cities_dict.keys():
             row = returnValue[i], cities_dict[returnValue[i]][0], cities_dict[returnValue[i]][1]
             tasks.append(list(row))
-
-    print(tasks)
+            
     url = "https://www.google.pl/maps/dir/"
     for i in range(len(returnValue)):
         url += str(cities_dict[returnValue[i]][0]) + "," + str(cities_dict[returnValue[i]][1]) + "/"
+        
     url +=  str(cities_dict[returnValue[0]][0]) + "," + str(cities_dict[returnValue[0]][1])
-    print(url)
+
     return render_template('result.hbs', task=tasks, url=url)
 if __name__ == "__main__":
     app.run(debug=True)

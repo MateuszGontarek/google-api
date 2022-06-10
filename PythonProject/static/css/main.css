@@ -39,9 +39,9 @@ td:hover:nth-child(4) {
     margin: 40px;
     font-size: 20px;
 }
-.submit a:hover {
+.update:hover {
     background-color: #6e6e;
 }
-.update:hover {
+.submit a:hover, .delete a:hover, .google:hover, .powrot:hover {
     background-color: #6e6e;
 }
