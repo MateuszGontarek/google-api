@@ -52,18 +52,7 @@ def delete_task(id):
     except:
         return redirect('error.hbs')
 
-@app.route('/update/<int:id>', methods=['GET', 'POST'])
-def update (id):
-    try:
-        task = Wspolrzedne.query.get_or_404(id)
-        if request.method == 'POST':
-            task.content = request.form['content']
-            db.session.commit()
-            return redirect('/')
-        else:
-            return render_template('update.hbs', task=task)
-    except:
-        return redirect('error.hbs')
+
 
 @app.route('/result', methods=['GET', 'POST'])
 def result():
