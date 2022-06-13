@@ -6,7 +6,7 @@ import googlemaps
 n_population = 50
 mutation_rate = 0.4
 DistanceList = []
-API_KEY = "API_KEY"
+API_KEY = "AIzaSyB54EuM0Lgs4bWoBgKwaK0O4x-7u60ZrfM"
 
 client = googlemaps.Client(API_KEY)
 

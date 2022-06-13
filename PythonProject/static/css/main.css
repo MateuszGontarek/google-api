@@ -46,6 +46,7 @@ td:hover:nth-child(4) {
 .update:hover {
     background-color: #6e6e;
 }
+
 .submit a:hover, .delete a:hover, .google:hover, .powrot:hover {
     background-color: #6e6e;
 }

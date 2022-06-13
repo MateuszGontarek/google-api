@@ -35,26 +35,35 @@ def index():
 
 @app.route('/delete')
 def delete():
-    db.session.query(Wspolrzedne).delete()
-    db.session.commit()
-    return redirect('/')
+    try:
+        db.session.query(Wspolrzedne).delete()
+        db.session.commit()
+        return redirect('/')
+    except:
+        return redirect('result.hbs')
 
 @app.route('/delete/<int:id>')
 def delete_task(id):
-    task = Wspolrzedne.query.get(id)
-    db.session.delete(task)
-    db.session.commit()
-    return redirect('/')
+    try:
+        task = Wspolrzedne.query.get(id)
+        db.session.delete(task)
+        db.session.commit()
+        return redirect('/')
+    except:
+        return redirect('error.hbs')
 
 @app.route('/update/<int:id>', methods=['GET', 'POST'])
 def update (id):
-    task = Wspolrzedne.query.get_or_404(id)
-    if request.method == 'POST':
-        task.content = request.form['content']
-        db.session.commit()
-        return redirect('/')
-    else:
-        return render_template('update.hbs', task=task)
+    try:
+        task = Wspolrzedne.query.get_or_404(id)
+        if request.method == 'POST':
+            task.content = request.form['content']
+            db.session.commit()
+            return redirect('/')
+        else:
+            return render_template('update.hbs', task=task)
+    except:
+        return redirect('error.hbs')
 
 @app.route('/result', methods=['GET', 'POST'])
 def result():
